@@ -75,6 +75,7 @@ impl Url {
   fn extract_port(&self) -> String {
     let url_parts: Vec<&str> = self
       .url
+      .trim_start_matches("http://")
       .splitn(2, '/')
       .collect();
 
