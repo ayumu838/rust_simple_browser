@@ -121,3 +121,94 @@ impl Url {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_url_host() {
+    let url = "http://wip.jp".to_string();
+    let expected = Ok(Url {
+      url: url.clone(),
+      host: "wip.jp".to_string(),
+      port: "80".to_string(),
+      path: "".to_string(),
+      searchpart: "".to_string(),
+    });
+
+    assert_eq!(expected, Url::new(url).parse());
+  }
+
+  #[test]
+  fn test_url_host_port() {
+    let url = "http://wip.jp:8080".to_string();
+    let expected = Ok(Url {
+      url: url.clone(),
+      host: "wip.jp".to_string(),
+      port: "8080".to_string(),
+      path: "".to_string(),
+      searchpart: "".to_string(),
+    });
+
+    assert_eq!(expected, Url::new(url).parse());
+  }
+
+  #[test]
+  fn test_utl_host_port_path() {
+    let url = "http://wip.jp:8080/index.html".to_string();
+    let expected = Ok(Url {
+      url: url.clone(),
+      host: "wip.jp".to_string(),
+      port: "8080".to_string(),
+      path: "index.html".to_string(),
+      searchpart: "".to_string(),
+    });
+
+    assert_eq!(expected, Url::new(url).parse());
+  }
+
+  #[test]
+  fn test_url_host_path() {
+    let url = "http://wip.jp/index.html".to_string();
+    let expected = Ok(Url {
+      url: url.clone(),
+      host: "wip.jp".to_string(),
+      port: "80".to_string(),
+      path: "index.html".to_string(),
+      searchpart: "".to_string(),
+    });
+
+    assert_eq!(expected, Url::new(url).parse());
+  }
+
+  #[test]
+  fn test_url_host_path_searchpart() {
+    let url = "http://wip.jp:8080/index.html?a=123&b=456".to_string();
+    let expected = Ok(Url {
+      url: url.clone(),
+      host: "wip.jp".to_string(),
+      port: "8080".to_string(),
+      path: "index.html".to_string(),
+      searchpart: "a=123&b=456".to_string(),
+    });
+
+    assert_eq!(expected, Url::new(url).parse());
+  }
+
+  #[test]
+  fn test_no_scheme() {
+    let url = "wip.jp".to_string();
+    let expected = Err("Only HTTP scheme is supported.".to_string());
+
+    assert_eq!(expected, Url::new(url).parse());
+  }
+
+  #[test]
+  fn test_unsupported_scheme() {
+    let url = "https://wip.jp:8080/index.html".to_string();
+    let expected = Err("Only HTTP scheme is supported.".to_string());
+
+    assert_eq!(expected, Url::new(url).parse());
+  }
+}
