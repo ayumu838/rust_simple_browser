@@ -1,7 +1,7 @@
 use alloc::string::String;
 use alloc::string::ToString;
 
-#[derive(Debuf, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Url {
     url: String,
     host: String,
