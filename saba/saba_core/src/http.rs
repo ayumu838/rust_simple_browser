@@ -1,17 +1,10 @@
 use alloc::string::String;
-use alloc::string::ToString;
+use alloc::format;
 use alloc::vec::Vec;
+use crate::alloc::string::ToString;
 use crate::error::Error;
 
 #[derive(Debug, Clone)]
-pub struct HttpResponse {
-  version: String,
-  status_code: u32,
-  reason: String,
-  headers: Vec<Header>,
-  body: String,
-}
-
 pub struct Header {
   name: String,
   value: String,
@@ -23,14 +16,26 @@ impl Header {
   }
 }
 
+#[derive(Debug, Clone)]
+pub struct HttpResponse {
+  version: String,
+  status_code: u32,
+  reason: String,
+  headers: Vec<Header>,
+  body: String,
+}
+
 impl HttpResponse {
   pub fn new(raw_response: String) -> Result<Self, Error> {
-    let preprocessed_response = raw_response.trim_start().replace("\n=\r", "\n");
+    let preprocessed_response = raw_response.trim_start().replace("\n\r", "\n");
 
     let (status_line, remaining) = match preprocessed_response.split_once('\n') {
       Some((s, r)) => (s, r),
       None => {
-        return Err(Error::Network(format!("Invalid http response: {}", preprocessed_response)))
+        return Err(Error::Network(format!(
+          "Invalid http response: {}",
+           preprocessed_response
+        )))
       }
     };
 
@@ -38,8 +43,8 @@ impl HttpResponse {
       Some((h, b)) => {
         let mut headers = Vec::new();
 
-        for headers in h.split('\n') {
-          let splitted_header: Vec<&str> = header.splitn(2, ':').cllect();
+        for header in h.split('\n') {
+          let splitted_header: Vec<&str> = header.splitn(2, ':').collect();
           headers.push(Header::new(
             String::from(splitted_header[0].trim()),
             String::from(splitted_header[1].trim()),
@@ -47,7 +52,7 @@ impl HttpResponse {
         }
         (headers, b)
       }
-      None => (Vec::new(), remaining);
+      None => (Vec::new(), remaining),
     };
 
     let statuses: Vec<&str> = status_line.split(' ').collect();
@@ -62,10 +67,10 @@ impl HttpResponse {
   }
 
   pub fn version(&self) -> String {
-    self.version.Clone()
+    self.version.clone()
   }
 
-  pub fn status_code(&self) => u32 {
+  pub fn status_code(&self) -> u32 {
     self.status_code.clone()
   }
 
