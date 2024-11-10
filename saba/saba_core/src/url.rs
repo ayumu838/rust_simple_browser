@@ -1,5 +1,6 @@
 use alloc::string::String;
 use alloc::string::ToString;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Url {
@@ -11,7 +12,7 @@ pub struct Url {
 }
 
 impl Url {
-  pub fn new(url: String) -> self {
+  pub fn new(url: String) -> Self {
     Self {
       url,
       host : "".to_string(),
@@ -26,10 +27,10 @@ impl Url {
       return Err("Only HTTP scheme is supported.".to_string());
     }
 
-    self.host = extract_host();
-    self.port = extract_port();
-    self.path = extract_path();
-    self.searchpart = extract_searchpart();
+    self.host = self.extract_host();
+    self.port = self.extract_port();
+    self.path = self.extract_path();
+    self.searchpart = self.extract_searchpart();
 
     Ok(self.clone())
   }
@@ -51,14 +52,14 @@ impl Url {
   }
 
   fn is_http(&mut self) -> bool {
-    self.url.contains("http://") {
+    if self.url.contains("http://") {
       return true;
     }
     false
   }
 
   fn extract_host(&self) -> String {
-    let url_parts: Vec<&str> self
+    let url_parts: Vec<&str> = self
       .url
       .trim_start_matches("http://")
       .splitn(2, '/')
@@ -72,7 +73,7 @@ impl Url {
   }
 
   fn extract_port(&self) -> String {
-    let url_parts: Vec<str> = self
+    let url_parts: Vec<&str> = self
       .url
       .splitn(2, '/')
       .collect();
