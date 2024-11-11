@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::string::String;
 use alloc::format;
+use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
-use crate::alloc::string::ToString;
 use noli::net::lookup_host;
 use noli::net::SocketAddr;
 use noli::net::TcpStream;
@@ -22,7 +22,7 @@ impl HttpClient {
       Err(e) => {
         return Err(Error::Network(format!(
           "Failed to find IP addresses: {:#?}",
-          e1
+          e
         )))
       }
     }
