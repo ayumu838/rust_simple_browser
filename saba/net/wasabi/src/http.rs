@@ -25,13 +25,13 @@ impl HttpClient {
           e
         )))
       }
-    }
+    };
 
     if ips.len() < 1 {
       return Err(Error::Network("Failed to find IP addresses".to_string()));
     }
 
-    let socket_addr = SocketAddr = (ips[0], port).info();
+    let socket_addr: SocketAddr = (ips[0], port).into();
 
     let mut stream = match TcpStream::connect(socket_addr) {
       Ok(stream) => stream,
@@ -49,14 +49,14 @@ impl HttpClient {
     // headers
     request.push_str("Host: ");
     request.push_str(&host);
-    request.push_str('\n');
+    request.push('\n');
     request.push_str("Accept: text/html\n");
     request.push_str("Connection: close\n");
-    request.push_str('\n');
+    request.push('\n');
 
     let _bytes_written = match stream.write(request.as_bytes()) {
       Ok(bytes) => bytes,
-      Err(_) = {
+      Err(_) => {
         return Err(Error::Network(
           "Failed to send a request to TCP stream".to_string(),
         ))
@@ -65,8 +65,8 @@ impl HttpClient {
 
     let mut received = Vec::new();
     loop {
-      let mut buf = (0u8; 4096);
-      let bytes_read = match stream.read(&mut buf){
+      let mut buf = [0u8; 4096];
+      let bytes_read = match stream.read(&mut buf) {
         Ok(bytes) => bytes,
         Err(_) => {
           return Err(Error::Network(
@@ -74,11 +74,9 @@ impl HttpClient {
           ))
         }
       };
-
       if bytes_read == 0 {
         break;
       }
-
       received.extend_from_slice(&buf[..bytes_read]);
     }
 
