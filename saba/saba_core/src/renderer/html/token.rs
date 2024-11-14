@@ -125,7 +125,7 @@ impl Iterator for HtmlTokenizer {
 
           if c.is_ascii_alphabetic() {
             self.reconsume = true;
-            sekf.state = State::TagName;
+            self.state = State::TagName;
             self.create_tag(true);
             continue;
           }
