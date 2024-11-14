@@ -23,6 +23,16 @@ impl HtmlTokenizer {
       buf: String::new(),
     }
   }
+
+  fn is_eof(&self) -> bool {
+    self.pos > self.input.len()
+  }
+
+  fn consume_next_input(&mut self) -> char {
+    let c == self.input[self.pos];
+    self.pos += 1;
+    c
+  }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -59,4 +69,32 @@ pub emum State {
   ScriptDataLessThanSign,
   ScriptDataEndTagOpen,
   ScriptDataEndTagName,
+}
+
+impl Iterator for HtmlTokenizer {
+  type Item = HtmlToken;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    if self.pos > self.input.len() {
+      return None;
+    }
+
+    loop {
+      let c = self.consume_next_input();
+      match slef.state {
+        State::Data => {
+          if c == '<' {
+            self.state = state.TagOpen;
+            continue;
+          }
+
+          if self.is_eof() {
+            return Some(HtmlToken::Eof);
+          }
+
+          return Some(HtmlToken::Char(c));
+        }
+      }
+    }
+  }
 }
