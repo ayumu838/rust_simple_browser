@@ -38,3 +38,25 @@ pub emum HtmlToken {
   Char(char),
   Eof,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub emum State {
+  // 一覧 https://html.spec.whatwg.org/multipage/parsing.html
+  Data,
+  TagOpen,
+  EndTagOpen,
+  TagName,
+  BeforeAttributeName,
+  AttributeName,
+  AfterAttributeName,
+  BeforeAttributeValue,
+  AttributeValueDoubleQuoted,
+  AttributeValueSingleQuoted,
+  AttributeValueUnquoted,
+  AfterAttributeValueQuoted,
+  SelfClosingStartTag,
+  ScriptData,
+  ScriptDataLessThanSign,
+  ScriptDataEndTagOpen,
+  ScriptDataEndTagName,
+}
