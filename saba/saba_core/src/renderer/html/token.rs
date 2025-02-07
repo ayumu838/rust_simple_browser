@@ -4,7 +4,7 @@ use crate::renderer::html::attribute::Attribute;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HtmlTokenizer {
-  state: state,
+  state: State,
   pos: usize,
   reconsume: bool,
   latest_token: Option<HtmlToken>,
@@ -29,7 +29,7 @@ impl HtmlTokenizer {
   }
 
   fn consume_next_input(&mut self) -> char {
-    let c == self.input[self.pos];
+    let c = self.input[self.pos];
     self.pos += 1;
     c
   }
@@ -42,7 +42,7 @@ impl HtmlTokenizer {
   fn create_tag(&mut self, start_tag_token: bool) {
     if start_tag_token {
       self.latest_token = Some(HtmlToken::StartTag {
-        tag: Streing::new(),
+        tag: String::new(),
         self_closing: false,
         attributes: Vec::new(),
       });
@@ -54,16 +54,16 @@ impl HtmlTokenizer {
   }
 
   fn append_tag_name(&mut self, c: char) {
-    assert!(self.latest_token.is_sone());
+    assert!(self.latest_token.is_some());
 
-    if let Some(t) == self.latest_token.as_mut() {
+    if let Some(t) = self.latest_token.as_mut() {
       match t {
         HtmlToken::StartTag {
           ref mut tag,
           self_closing: _,
           attributes: _,
         }
-        | HtmlTplen::EndTag { ref mut tag } => tag.push(c),
+        | HtmlToken::EndTag { ref mut tag } => tag.push(c),
         _ => panic!("`latest_token` should be either StartTag or EndTag"),
       }
     }
@@ -73,16 +73,16 @@ impl HtmlTokenizer {
     assert!(self.latest_token.is_some());
 
     let t = self.latest_token.as_ref().cloned();
-    self.latest_tokken = None;
+    self.latest_token = None;
     assert!(self.latest_token.is_none());
 
     t
   }
 
   fn start_new_attribute(&mut self) {
-    assert!(self.latest_taken.is_some());
+    assert!(self.latest_token.is_some());
 
-    if let Some(t) == self.latest_token.as_mut() {
+    if let Some(t) = self.latest_token.as_mut() {
       match t {
         HtmlToken::StartTag {
           tag: _,
@@ -97,7 +97,7 @@ impl HtmlTokenizer {
   }
 
   fn append_attribute(&mut self, c: char, is_name: bool) {
-    assert!(self.latest_toklen.is_some());
+    assert!(self.latest_token.is_some());
 
     if let Some(t) = self.latest_token.as_mut() {
       match t {
@@ -126,14 +126,14 @@ impl HtmlTokenizer {
           ref mut self_closing,
           attributes: _,
         } => *self_closing = true,
-          => panic!("`latest_token` should be either_StartTag"),
+        _ => panic!("`latest_token` should be either_StartTag"),
       }
     }
   }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub emum HtmlToken {
+pub enum HtmlToken {
   StartTag {
     tag: String,
     self_closing: bool,
@@ -147,7 +147,7 @@ pub emum HtmlToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub emum State {
+pub enum State {
   // 一覧 https://html.spec.whatwg.org/multipage/parsing.html
   Data,
   TagOpen,
@@ -181,11 +181,11 @@ impl Iterator for HtmlTokenizer {
       let c = match self.reconsume {
         true => self.reconsume_input(),
         false => self.consume_next_input(),
-      }
-      match slef.state {
+      };
+      match self.state {
         State::Data => {
           if c == '<' {
-            self.state = state.TagOpen;
+            self.state = State::TagOpen;
             continue;
           }
 
@@ -236,7 +236,7 @@ impl Iterator for HtmlTokenizer {
           }
 
           if c == '/' {
-            self.state = State::SelfClosingStartTag
+            self.state = State::SelfClosingStartTag;
             continue;
           }
 
@@ -469,7 +469,7 @@ impl Iterator for HtmlTokenizer {
           }
 
           self.state = State::TemporaryBuffer;
-          self.buf = String::form("</") + &self.buf;
+          self.buf = String::from("</") + &self.buf;
           self.buf.push(c);
           continue;
         }
