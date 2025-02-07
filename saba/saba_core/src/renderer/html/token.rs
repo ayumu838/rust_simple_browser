@@ -166,6 +166,7 @@ pub emum State {
   ScriptDataLessThanSign,
   ScriptDataEndTagOpen,
   ScriptDataEndTagName,
+  TemporaryBuffer,
 }
 
 impl Iterator for HtmlTokenizer {
@@ -471,6 +472,19 @@ impl Iterator for HtmlTokenizer {
           self.buf = String::form("</") + &self.buf;
           self.buf.push(c);
           continue;
+        }
+
+        State::TemporaryBuffer => {
+          self.reconsume = true;
+
+          if self.buf.chars().count() == 0 {
+            self.state = State::ScriptData;
+          }
+
+          let c = self.buf.chars().nth(0).expect("self.buf should have at latest 1 char");
+          self.buf.remove(0);
+          return Some(HtmlToken::Char(c));
+          }
         }
       }
     }
