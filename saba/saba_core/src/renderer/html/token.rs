@@ -440,6 +440,21 @@ impl Iterator for HtmlTokenizer {
           self.state = State::ScriptData;
           return Some(HtmlToken::Char('<'));
         }
+
+        State::ScriptDataEndTagOpen => {
+          if c.is_ascii_alphabetic() {
+            self.reconsume = true;
+            self.state = State::ScriptDataEndTagName;
+            self.create_tag(false);
+            continue;
+          }
+
+          self.reconsume = true;
+          self.state = State::ScriptData;
+          // 仕様では '</' の2つの文字トークンを返すが
+          // プログラムの関係で1つの文字トークンを返す
+          return Some(HtmlToken::Char('<'));
+        }
       }
     }
   }
