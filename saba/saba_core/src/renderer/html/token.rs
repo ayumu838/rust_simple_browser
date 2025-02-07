@@ -484,7 +484,6 @@ impl Iterator for HtmlTokenizer {
           let c = self.buf.chars().nth(0).expect("self.buf should have at latest 1 char");
           self.buf.remove(0);
           return Some(HtmlToken::Char(c));
-          }
         }
       }
     }
